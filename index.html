@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Express Etli Ekmek Lahmacun: Keçiören Bademlik'te Konya usulü etli ekmek, lahmacun ve pide. Her gün 10:00–22:00. WhatsApp'tan sipariş: 0539 915 43 08.">
+<meta name="theme-color" content="#1c120d">
+<meta property="og:title" content="Express Etli Ekmek Lahmacun">
+<meta property="og:description" content="Konyadan gelen lezzet. Keçiören Bademlik'te etli ekmek, lahmacun ve pide.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>Express Etli Ekmek Lahmacun · Keçiören Bademlik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500..900;1,600..800&display=swap">
+<style>
+/* Layout: mobil öncelikli restoran sitesi. Koyu "is" zeminde fotoğraflı açılış, krem kâğıt üstünde sipariş verilebilen menü
+   fiyatlı menü ve sipariş butonları, kırmızı tabela bandı, SSS ve iletişim. Logo ve başlıklar dükkanın tabelasındaki geniş, kalın harflerle. */
+:root{
+  color-scheme:dark;
+  --is:#1c120d; --is-2:#261912; --kahve:#2a1b13;
+  --kraft:#f1e6d0; --kraft-2:#e7d8bb; --kart:#fbf5ea;
+  --murekkep:#22160f; --murekkep-2:#6b5544;
+  --tabela:#d8232a; --tabela-koyu:#b51b21;
+  --kor:#f2a33a; --un:#f7eddd; --kul:#c2ae97;
+  --cizgi-k:rgba(247,237,221,.16); --cizgi-p:rgba(34,22,15,.16);
+  --f:"Montserrat","Helvetica Neue",Arial,sans-serif;
+  --gut:max(16px,4vw);
+  --maxw:1440px;
+  --top:64px;
+}
+html{background:var(--is);scroll-padding-top:calc(var(--top) + 56px)}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{margin:0;background:var(--is);color:var(--un);font-family:var(--f);font-size:16.5px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+img{display:block;max-width:100%}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--kor);outline-offset:3px}
+.wrap{padding-inline:var(--gut);max-width:var(--maxw);margin-inline:auto;box-sizing:border-box}
+.hiz{display:inline-block;width:20px;height:11px;flex:none;vertical-align:middle;
+  background:linear-gradient(currentColor 0 2px,transparent 2px 4.5px,currentColor 4.5px 6.5px,transparent 6.5px 9px,currentColor 9px 11px)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.h-xl{margin:0;font-weight:800;line-height:1;letter-spacing:-.02em;text-transform:uppercase;text-wrap:balance}
+.btn{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:4px;border:1px solid transparent;
+  text-decoration:none;font-weight:700;font-size:16px;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s}
+.btn.red{background:var(--tabela);color:var(--un)}
+.btn.red:hover{background:var(--tabela-koyu)}
+.btn.line{border-color:var(--cizgi-k);color:var(--un);background:transparent}
+.btn.line:hover{border-color:var(--un)}
+.btn[aria-disabled="true"]{opacity:.45;pointer-events:none}
+
+/* ---------- logo: dükkan tabelasından ölçülerek çizilen SVG (halkalı E) ---------- */
+.lg{display:block;height:auto;color:var(--tabela)}
+.sign{margin:0 0 6px;width:min(100%,540px)}
+.sign svg{display:block;width:100%;height:auto;color:var(--tabela);overflow:visible;filter:drop-shadow(0 2px 14px rgba(20,10,6,.45))}
+.sign .p-bg{fill:var(--kraft)}.sign .p-tx{fill:var(--kahve)}.sign .d-tx{fill:var(--un)}.sign .d-bar{fill:var(--tabela)}
+
+/* ---------- üst bar ---------- */
+.top{position:sticky;top:0;z-index:40;height:var(--top);box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 max(var(--gut),calc((100% - var(--maxw))/2 + var(--gut)));background:rgba(28,18,13,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--cizgi-k)}
+.brand{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--un);min-width:0}
+.brand .lg{width:136px}
+.brand-sub{font-weight:600;font-size:9.5px;letter-spacing:.14em;color:var(--kul);padding-left:13px;white-space:nowrap}
+.nav{display:flex;align-items:center;gap:22px}
+.nav a{font-weight:600;font-size:15px;text-decoration:none;color:var(--kul)}
+.nav a:hover{color:var(--un)}
+.top-actions{display:flex;gap:8px;align-items:center}
+.top-actions .btn{min-height:40px;padding:0 14px;font-size:15px}
+.call-ico{width:40px;padding:0!important}
+@media (max-width:900px){.nav{display:none}}
+
+/* ---------- açılış ---------- */
+.hero{position:relative;background:var(--is)}
+.hero-img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;background:#120b08}
+.hero-body{display:flex;flex-direction:column;gap:18px;padding-block:24px 36px}
+.hero p.lead{margin:0;max-width:44ch;font-weight:500;font-size:clamp(17px,1.8vw,21px);line-height:1.45}
+.hero-cta{display:flex;flex-wrap:wrap;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:6px 0 0;padding:0}
+.chips li{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid var(--cizgi-k);border-radius:999px;font-weight:600;font-size:14px;color:var(--un)}
+.chips b{color:var(--kor)}
+@media (min-width:900px){
+  /* açılış ekranı doldurur (alttaki kırmızı şerit ilk ekranda görünür); yazılar ekran genişliğiyle birlikte büyür */
+  .hero{min-height:max(560px,calc(100vh - var(--top) - 46px));min-height:max(560px,calc(100svh - var(--top) - 46px));display:grid}
+  .hero-img{position:absolute;inset:0;height:100%;aspect-ratio:auto}
+  .hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(28,18,13,.95) 0%,rgba(28,18,13,.84) 40%,rgba(28,18,13,.22) 74%),linear-gradient(0deg,rgba(28,18,13,.75),rgba(28,18,13,0) 35%)}
+  .hero-body{position:relative;z-index:1;align-self:center;padding-block:56px;max-width:var(--maxw);width:100%;margin:0 auto;gap:clamp(18px,1.5vw,28px)}
+  .sign{width:clamp(460px,42vw,780px)}
+  .hero p.lead{font-size:clamp(18px,1.35vw,24px)}
+  .hero-cta .btn{min-height:clamp(48px,3.3vw,58px);padding-inline:clamp(20px,1.6vw,30px);font-size:clamp(16px,1.1vw,18.5px)}
+  .chips li{font-size:clamp(14px,.95vw,16px);padding:.5em .9em}
+}
+
+/* ---------- bilgi şeridi ---------- */
+.strip{background:var(--tabela);color:var(--un)}
+.strip ul{list-style:none;margin:0 auto;padding:12px var(--gut);max-width:var(--maxw);box-sizing:border-box;display:flex;flex-wrap:wrap;gap:6px 26px;font-weight:600;font-size:15px}
+.strip li{display:inline-flex;align-items:center;gap:8px}
+
+/* ---------- menü ---------- */
+.menu{background:var(--kraft);color:var(--murekkep);padding-block:56px 72px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")}
+.menu :focus-visible{outline-color:var(--tabela)}
+.menu-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 40px;margin-bottom:22px}
+.menu-head h2{font-size:clamp(40px,6vw,80px);color:var(--tabela)}
+.menu-head p{margin:0;max-width:42ch;font-weight:500;font-size:17px;line-height:1.45}
+.tabs{position:sticky;top:var(--top);z-index:20;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--gut)) 8px;padding:10px var(--gut);
+  background:rgba(241,230,208,.95);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--cizgi-p)}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{flex:none;padding:9px 14px;border-radius:999px;border:1px solid var(--cizgi-p);text-decoration:none;font-weight:700;font-size:15px;color:var(--murekkep);background:var(--kart)}
+.tabs a[aria-current="true"]{background:var(--murekkep);color:var(--kraft);border-color:var(--murekkep)}
+.cat{padding-top:30px}
+.cat h3{display:flex;align-items:center;gap:14px;margin:0 0 16px;font-weight:800;font-size:clamp(19px,1.5vw,23px);letter-spacing:.05em;text-transform:uppercase;color:var(--tabela)}
+.cat h3::after{content:"";flex:1;height:2px;background:currentColor;opacity:.22}
+.price{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* fotoğraflı öne çıkan ürünler */
+.feat{display:grid;gap:12px;list-style:none;margin:0 0 14px;padding:0}
+.fcard{display:grid;grid-template-columns:116px minmax(0,1fr);background:var(--kart);border:1px solid var(--cizgi-p);border-radius:10px;overflow:hidden;
+  box-shadow:0 14px 28px -22px rgba(34,22,15,.55)}
+.fcard img{width:100%;height:100%;min-height:116px;object-fit:cover;background:var(--murekkep)}
+.fb{display:flex;flex-direction:column;gap:6px;padding:14px 16px;min-width:0}
+.fh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.fcard h4{margin:0;font-weight:800;font-size:18px;line-height:1.2}
+.fcard .price{flex:none;padding:5px 10px 4px;border-radius:999px;background:var(--tabela);color:var(--un);font-size:16px;line-height:1}
+.fcard p{margin:0;color:var(--murekkep-2);font-size:14.5px;line-height:1.45}
+@media (min-width:760px){
+  .feat{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .fcard{grid-template-columns:none;grid-template-rows:auto 1fr}
+  .fcard img{height:auto;min-height:0;aspect-ratio:4/3}
+  .fb{padding:16px 18px 20px;gap:8px}
+  .fcard h4{font-size:clamp(19px,1.5vw,22px)}
+  .fcard .price{font-size:clamp(16px,1.2vw,18px);padding:6px 12px 5px}
+}
+/* diğer ürünler: noktalı menü listesi */
+.list{list-style:none;margin:0;padding:4px 20px;background:var(--kart);border:1px solid var(--cizgi-p);border-radius:10px;display:grid;column-gap:56px}
+.row{padding:15px 0;border-top:1px solid var(--cizgi-p)}
+.row:first-child{border-top:0}
+.rh{display:flex;align-items:baseline;gap:10px}
+.rh h4{margin:0;font-weight:700;font-size:17.5px;line-height:1.25}
+.rh i{flex:1;min-width:20px;height:0;border-bottom:2px dotted rgba(34,22,15,.32);transform:translateY(-.3em)}
+.rh .price{font-size:17.5px;color:var(--murekkep)}
+.row p{margin:4px 0 0;font-size:14.5px;line-height:1.4;color:var(--murekkep-2)}
+@media (min-width:760px){
+  .list{grid-template-columns:repeat(2,minmax(0,1fr));padding:6px 28px}
+  .row:nth-child(2){border-top:0}
+  .rh h4,.rh .price{font-size:clamp(17.5px,1.3vw,19.5px)}
+}
+.ikram{margin-top:24px;padding:18px 20px;border-radius:6px;background:var(--murekkep);color:var(--kraft);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 24px}
+.ikram b{font-weight:800;font-size:19px;text-transform:uppercase;color:var(--kor)}
+.ikram span{font-size:16px}
+.order-cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.btn.ink{border-color:var(--murekkep);color:var(--murekkep)}
+.btn.ink:hover{background:var(--murekkep);color:var(--kraft)}
+.menu-note{margin:14px 0 0;font-size:14px;color:var(--murekkep-2)}
+
+/* ---------- tabela ---------- */
+.tabela{background:var(--tabela);color:var(--un);padding-block:72px}
+.tabela :focus-visible{outline-color:var(--un)}
+.tabela-in{display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
+@media (min-width:900px){.tabela-in{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-items:end;gap:64px}}
+.tabela-kicker{margin:0 0 14px;display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
+.tabela h2{font-size:clamp(34px,5vw,70px)}
+.tabela-body{display:flex;flex-direction:column;gap:18px;max-width:52ch}
+.tabela-body p{margin:0;font-size:18px}
+.slogan{font-weight:800;font-style:italic;font-size:clamp(22px,2.2vw,30px)!important;line-height:1.15}
+.feats{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.feats li{padding:8px 14px;border-radius:999px;background:rgba(247,237,221,.14);font-weight:700;font-size:15px}
+.rating{align-self:flex-start;display:inline-flex;align-items:center;gap:12px;padding:12px 18px;border-radius:999px;background:var(--un);color:var(--murekkep);text-decoration:none;font-weight:700;font-size:16px}
+.rating b{font-weight:800;font-size:20px;color:var(--tabela)}
+
+/* ---------- iletişim ---------- */
+.contact{background:var(--kahve);padding-block:72px}
+.contact-in{display:grid;grid-template-columns:minmax(0,1fr);gap:36px}
+@media (min-width:900px){.contact-in{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px}}
+.contact h2{font-size:clamp(36px,5.4vw,74px)}
+.contact-cta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:22px}
+.contact-cta .btn{min-height:56px;font-size:17px}
+.contact-cta .btn.red{grid-column:1/-1}
+.info{margin:0;display:flex;flex-direction:column;border-top:1px solid var(--cizgi-k)}
+.info > div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;padding:16px 0;border-bottom:1px solid var(--cizgi-k)}
+.info dt{font-weight:600;font-size:15px;color:var(--kul)}
+.info dd{margin:0;font-size:18px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;overflow-wrap:anywhere}
+.linkish{all:unset;cursor:pointer;font-weight:700;font-size:14px;color:var(--kor);border-bottom:1px solid currentColor}
+.linkish:focus-visible{outline:2px solid var(--kor);outline-offset:3px}
+@media (max-width:420px){.info > div{grid-template-columns:minmax(0,1fr);gap:2px}.contact-cta{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- alt bilgi ---------- */
+.foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px 32px;padding-block:40px calc(env(safe-area-inset-bottom,0px) + 40px)}
+.foot p{margin:0;font-size:14px;color:var(--kul)}
+
+/* ---------- telefon alt çubuğu ---------- */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:45;padding:10px 12px calc(env(safe-area-inset-bottom,0px) + 10px);
+  background:rgba(28,18,13,.97);border-top:1px solid var(--cizgi-k)}
+.bar-quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.bar-quick a{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:48px;border:1px solid var(--cizgi-k);border-radius:4px;text-decoration:none;font-weight:700;font-size:15px}
+.bar-quick a.red{background:var(--tabela);border-color:var(--tabela)}
+body{padding-bottom:84px}
+@media (min-width:1000px){.bar{display:none}body{padding-bottom:0}}
+@media (min-width:1000px){.foot{padding-bottom:40px}}
+</style>
+</head>
+<body>
+<div lang="tr">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<g id="xl" fill="currentColor"><path d="M-42.5 119A105 105 0 1 1 119 100L94 100A85 85 0 1 0 -8.5 119Z"/><path d="M0 0L77 0L77 27L30 27L30 39L74 39L74 63L30 63L30 76L115 76L115 100L0 100Z"/><path d="M140 100 176.1 49.6 141.3 0H179.1L196.1 25.1L212.7 0H249L214.3 48.3L251.1 100H212.6L195.3 73.3L178.4 100ZM245.6 100V0H293.8Q307.8 0 318 4.6Q328.2 9.1 333.8 17.6Q339.3 26.1 339.3 37.7Q339.3 49.3 333.8 57.7Q328.2 66.1 318 70.8Q307.8 75.4 293.8 75.4H279.3V100ZM279.3 49.4H291.6Q298.6 49.4 302 46.3Q305.3 43.1 305.3 37.7Q305.3 32.3 302 29.1Q298.6 26 291.6 26H279.3ZM340.7 100V0H387.4Q410.4 0 422.4 10.1Q434.4 20.3 434.4 37.7Q434.4 48.6 429.5 56.6Q424.5 64.6 415.5 69.1L436.5 100H400.5L383.5 74.9H374.4V100ZM374.4 49.4H386.7Q393.7 49.4 397 46.3Q400.4 43.1 400.4 37.7Q400.4 32.3 397 29.1Q393.7 26 386.7 26H374.4ZM437.5 100V0H518.7V25.4H470.6V37.1H512.9V61.4H470.6V74.6H520.6V100ZM561.2 102.3Q548.7 102.3 536.9 99.4Q525.2 96.6 517.7 92L528.5 67.4Q535.7 71.6 544.4 74.1Q553.2 76.6 561.5 76.6Q568.7 76.6 571.6 75.1Q574.5 73.7 574.5 71.1Q574.5 68.4 571.5 66.9Q568.5 65.3 563.6 64.2Q558.7 63.1 552.8 61.9Q546.9 60.7 541 58.7Q535.1 56.7 530.2 53.4Q525.2 50.1 522.2 44.8Q519.2 39.4 519.2 31.4Q519.2 22.1 524.4 14.5Q529.7 6.9 540 2.3Q550.4 -2.3 565.8 -2.3Q575.9 -2.3 585.8 -0.1Q595.7 2 603.5 6.4L593.4 30.9Q578.7 23.4 565.5 23.4Q558.1 23.4 555.3 25.3Q552.5 27.1 552.5 29.7Q552.5 32.3 555.5 33.8Q558.5 35.3 563.4 36.3Q568.4 37.3 574.3 38.4Q580.2 39.6 586.1 41.6Q591.9 43.6 596.9 46.9Q601.8 50.1 604.8 55.4Q607.8 60.7 607.8 68.6Q607.8 77.7 602.6 85.4Q597.4 93 587.1 97.6Q576.8 102.3 561.2 102.3ZM645.4 102.3Q632.9 102.3 621.1 99.4Q609.4 96.6 601.9 92L612.7 67.4Q619.9 71.6 628.6 74.1Q637.4 76.6 645.7 76.6Q652.9 76.6 655.8 75.1Q658.7 73.7 658.7 71.1Q658.7 68.4 655.7 66.9Q652.7 65.3 647.8 64.2Q642.9 63.1 637 61.9Q631.1 60.7 625.2 58.7Q619.3 56.7 614.4 53.4Q609.4 50.1 606.4 44.8Q603.4 39.4 603.4 31.4Q603.4 22.1 608.6 14.5Q613.9 6.9 624.2 2.3Q634.6 -2.3 650 -2.3Q660.1 -2.3 670 -0.1Q679.9 2 687.7 6.4L677.6 30.9Q662.9 23.4 649.7 23.4Q642.3 23.4 639.5 25.3Q636.7 27.1 636.7 29.7Q636.7 32.3 639.7 33.8Q642.7 35.3 647.6 36.3Q652.6 37.3 658.5 38.4Q664.4 39.6 670.3 41.6Q676.1 43.6 681.1 46.9Q686 50.1 689 55.4Q692 60.7 692 68.6Q692 77.7 686.8 85.4Q681.6 93 671.3 97.6Q661 102.3 645.4 102.3Z"/></g>
+</defs></svg>
+<header class="top">
+  <a class="brand" href="#ust" aria-label="Express Etli Ekmek Lahmacun, başa dön">
+    <svg class="lg" viewBox="-76 -63 770 184" aria-hidden="true" focusable="false"><use href="#xl"/></svg>
+    <span class="brand-sub">ETLİ EKMEK · LAHMACUN</span>
+  </a>
+  <nav class="nav" aria-label="Ana menü">
+    <a href="#menu">Menü</a>
+    <a href="#biz">Biz kimiz</a>
+    <a href="#iletisim">İletişim</a>
+  </nav>
+  <div class="top-actions">
+    <a class="btn line call-ico" href="tel:+905399154308" aria-label="Ara: 0539 915 43 08">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
+    </a>
+    <a class="btn red" href="https://wa.me/905399154308?text=Merhaba%2C%20sipari%C5%9F%20vermek%20istiyorum." target="_blank" rel="noopener">Sipariş ver</a>
+  </div>
+</header>
+
+<main id="ust">
+  <section class="hero" aria-labelledby="hero-title">
+    <img class="hero-img" src="img/hero.webp" alt="Dilimlenmiş etli ekmek, kara taş üzerinde" width="1448" height="1086" fetchpriority="high">
+    <div class="hero-body wrap">
+      <h1 class="sign" id="hero-title">
+        <span class="sr">Express Etli Ekmek Lahmacun – Konyadan gelen lezzet</span>
+        <svg class="lockup" viewBox="-80 -66 778 343" aria-hidden="true" focusable="false"><use href="#xl"/><rect class="p-bg" x="0" y="138" width="634" height="61" rx="30.5"/><path class="p-tx" d="M43.9 169 56.8 156.8Q57.5 156.1 57.8 155.7Q58 155.2 57.8 154.9Q57.6 154.6 57.1 154.4L56.3 154Q55.5 153.6 55.2 153.1Q54.8 152.5 54.8 151.7Q54.8 150.7 55.4 150.1Q56 149.5 57.3 149.5H66.7Q68 149.5 68.6 150.1Q69.2 150.7 69.2 151.7Q69.2 152.6 68.6 153.1Q68 153.7 66.8 154.3Q66.4 154.4 66 154.7Q65.7 154.9 65.3 155.2Q64.9 155.5 64.3 156Q63.7 156.5 62.9 157.3L45.7 173.1ZM49.4 165.8 56.7 159.8 67.5 176.1Q68 176.8 68.5 177.2Q68.9 177.5 69.4 177.7Q70.2 178.1 70.6 178.8Q70.9 179.5 70.9 180.3Q70.9 181.3 70.3 181.9Q69.7 182.5 68.5 182.5H56.6Q55.3 182.5 54.7 181.9Q54.1 181.3 54.1 180.3Q54.1 179.5 54.5 178.9Q54.8 178.4 55.4 178.1L55.9 177.8Q56.4 177.5 56.4 177Q56.3 176.5 55.8 175.6ZM47.4 175.5Q47.4 176.5 47.7 177Q47.9 177.4 48.5 177.7L49 178Q49.7 178.4 50.1 178.9Q50.5 179.5 50.5 180.3Q50.5 181.3 49.8 181.9Q49.2 182.5 48 182.5H36.5Q35.2 182.5 34.6 181.9Q34 181.3 34 180.3Q34 178.7 35.5 178L36.3 177.6Q36.9 177.3 37.2 176.8Q37.5 176.4 37.5 175.5V156.5Q37.5 155.6 37.2 155.2Q36.9 154.7 36.3 154.4L35.5 154Q34 153.3 34 151.7Q34 150.7 34.6 150.1Q35.2 149.5 36.5 149.5H48.5Q49.7 149.5 50.3 150.1Q50.9 150.7 50.9 151.7Q50.9 153.3 49.5 154L48.7 154.4Q48.1 154.7 47.8 155.2Q47.4 155.6 47.4 156.5ZM88 159.6Q91.8 159.6 94.7 161.1Q97.5 162.6 99.1 165.3Q100.7 167.9 100.7 171.4Q100.7 174.7 99.1 177.4Q97.4 180 94.5 181.5Q91.5 183.1 87.7 183.1Q83.9 183.1 81 181.6Q78.2 180.1 76.6 177.4Q75 174.7 75 171.2Q75 167.9 76.6 165.3Q78.3 162.7 81.2 161.1Q84.1 159.6 88 159.6ZM89.7 178.6Q90.6 178.3 91.2 177.3Q91.7 176.3 91.7 174.6Q91.7 172.9 91.1 170.5Q90.5 168.1 89.7 166.6Q88.8 165.1 87.9 164.5Q86.9 163.8 86 164.1Q85.2 164.3 84.6 165.3Q84.1 166.2 84 167.9Q84 169.7 84.6 172.1Q85.2 174.6 86.1 176.1Q86.9 177.6 87.9 178.2Q88.8 178.8 89.7 178.6ZM116.8 161.6V176.3Q116.8 177.5 117 178Q117.1 178.5 117.5 178.7L117.9 179Q118.8 179.6 118.8 180.6Q118.8 182.5 117 182.5H107.7Q106.8 182.5 106.2 182Q105.7 181.5 105.7 180.6Q105.7 180 106 179.5Q106.3 179.1 106.8 178.7L107.2 178.5Q107.6 178.3 107.7 177.8Q107.9 177.4 107.9 176.3V168Q107.9 167 107.7 166.6Q107.4 166.3 107 166L106.5 165.9Q106 165.6 105.7 165.2Q105.4 164.8 105.4 164.2Q105.4 163.5 105.8 163.1Q106.2 162.6 107.2 162.2L111.7 160.4Q112.9 160 113.6 159.8Q114.3 159.6 115 159.6Q115.9 159.6 116.4 160.2Q116.8 160.7 116.8 161.6ZM116 168 114.4 166.1 115.5 165Q118.6 162 120.9 160.8Q123.3 159.6 125.3 159.6Q128.3 159.6 130.2 161.6Q132 163.6 132 166.9V176.3Q132 177.4 132.2 177.8Q132.4 178.3 132.7 178.5L133.1 178.7Q133.6 179.1 133.9 179.6Q134.2 180 134.2 180.6Q134.2 181.5 133.7 182Q133.2 182.5 132.2 182.5H122.9Q121.1 182.5 121.1 180.6Q121.1 179.6 122 179L122.4 178.7Q122.8 178.5 122.9 178Q123.1 177.5 123.1 176.3V169.1Q123.1 167.5 122.3 166.7Q121.6 165.9 120.3 165.9Q119.5 165.9 118.6 166.2Q117.7 166.5 116.9 167.3ZM155.7 179.3 151 187.9 140.7 166.1Q140.3 165.1 139.8 164.8Q139.3 164.4 138.6 164Q138.1 163.6 137.8 163.2Q137.5 162.7 137.5 162.1Q137.5 161.2 138 160.7Q138.6 160.2 139.5 160.2H150.8Q151.7 160.2 152.3 160.7Q152.8 161.2 152.8 162.1Q152.8 162.7 152.4 163.2Q152 163.7 151.4 163.9L150.7 164.2Q150.1 164.4 150.1 165.2Q150.1 166 150.6 167.3ZM149.6 185.3 150.5 183.5 152.3 180.5 157.4 167.6Q158 166.2 157.8 165.3Q157.6 164.5 156.8 164.2L156.1 163.9Q155.5 163.7 155.2 163.2Q154.8 162.7 154.8 162.1Q154.8 161.2 155.4 160.7Q155.9 160.2 156.8 160.2H163.2Q164.2 160.2 164.7 160.7Q165.3 161.2 165.3 162.1Q165.3 162.6 165 163.1Q164.8 163.5 164.2 163.9Q163.5 164.4 162.9 165.1Q162.4 165.7 161.7 167.2L154.8 183.6Q153.2 187.2 151.8 189.4Q150.4 191.6 148.8 192.6Q147.2 193.6 144.9 193.6Q141.6 193.6 139.7 191.8Q137.8 189.9 137.8 187Q137.8 185.3 138.7 184.2Q139.5 183.1 141.1 183.1Q142.7 183.1 143.4 183.9Q144.2 184.8 144.9 186.2L145.4 187.3Q145.7 187.9 146.1 188.3Q146.4 188.6 146.9 188.6Q147.4 188.6 147.8 188.3Q148.3 188.1 148.7 187.3Q149.1 186.6 149.6 185.3ZM182.9 178.8V178.2L182.1 178V165.1Q182.1 164 181.5 163.4Q180.9 162.8 180 162.8Q179.2 162.8 178.7 163.2Q178.2 163.5 178.2 164.1V165.5Q178.2 167.3 177 168.3Q175.8 169.3 173.5 169.3Q171.6 169.3 170.6 168.5Q169.7 167.6 169.7 166.1Q169.7 164.6 171.1 163.1Q172.5 161.6 175.3 160.6Q178.1 159.6 182.3 159.6Q186.7 159.6 188.8 161.4Q190.9 163.2 190.9 166.3V176.6Q190.9 177 191.1 177.3Q191.3 177.6 191.8 177.6Q192.1 177.6 192.3 177.5Q192.4 177.4 192.6 177.3Q192.7 177.2 192.8 177.2Q193 177.1 193.2 177.1Q193.7 177.1 194 177.5Q194.3 177.9 194.3 178.5Q194.3 179.6 193.6 180.7Q192.9 181.7 191.6 182.4Q190.3 183.1 188.6 183.1Q186.2 183.1 184.5 181.9Q182.9 180.7 182.9 178.8ZM168.8 177.5Q168.8 174.3 171.7 172.4Q174.6 170.5 179.4 170.5Q180.7 170.5 181.7 170.7Q182.8 170.8 183.5 171.1L182.6 173.7Q182.1 173.4 181.6 173.3Q181 173.2 180.4 173.2Q179.2 173.2 178.5 173.9Q177.8 174.6 177.8 175.7Q177.8 176.9 178.5 177.6Q179.2 178.3 180.3 178.3Q181.2 178.3 181.9 177.9Q182.6 177.6 183 177.1L183.6 179.7Q182.4 181.3 180.3 182.2Q178.1 183.1 175.7 183.1Q172.5 183.1 170.7 181.5Q168.8 179.9 168.8 177.5ZM214.7 177.7 214.3 177.6V155.4Q214.3 154.4 214.1 154.1Q213.8 153.7 213.4 153.5L212.9 153.3Q212.4 153 212.1 152.6Q211.8 152.3 211.8 151.7Q211.8 151 212.2 150.5Q212.6 150 213.5 149.7L218.1 147.9Q219.3 147.4 220 147.2Q220.7 147 221.4 147Q222.3 147 222.8 147.6Q223.2 148.2 223.2 149V176.3Q223.2 177.4 223.4 177.8Q223.6 178.3 223.9 178.5L224.3 178.7Q224.9 179.1 225.2 179.5Q225.5 180 225.5 180.6Q225.5 181.5 224.9 182Q224.4 182.5 223.4 182.5H218.6Q217.1 182.5 215.9 181.4Q214.7 180.4 214.7 178.9ZM198 172.1Q198 168.3 199.5 165.5Q201.1 162.7 203.7 161.1Q206.3 159.6 209.6 159.6Q212.4 159.6 214.4 160.8Q216.5 162.1 218 164.5L215.6 167.4Q214.7 165.6 213.7 164.9Q212.6 164.2 211.4 164.2Q210.2 164.2 209.3 165Q208.3 165.8 207.8 167.3Q207.3 168.9 207.3 171Q207.3 173.3 207.9 174.8Q208.4 176.3 209.4 177.1Q210.4 177.8 211.6 177.8Q212.9 177.8 214 177Q215.1 176.2 215.9 174.5L217.4 176.3Q215.5 179.5 213.1 181.3Q210.6 183.1 207.5 183.1Q204.8 183.1 202.6 181.7Q200.5 180.3 199.3 177.8Q198 175.3 198 172.1ZM244.3 178.8V178.2L243.5 178V165.1Q243.5 164 242.9 163.4Q242.4 162.8 241.4 162.8Q240.7 162.8 240.2 163.2Q239.6 163.5 239.6 164.1V165.5Q239.6 167.3 238.4 168.3Q237.2 169.3 235 169.3Q233 169.3 232 168.5Q231.1 167.6 231.1 166.1Q231.1 164.6 232.5 163.1Q233.9 161.6 236.7 160.6Q239.5 159.6 243.7 159.6Q248.1 159.6 250.2 161.4Q252.4 163.2 252.4 166.3V176.6Q252.4 177 252.6 177.3Q252.8 177.6 253.2 177.6Q253.5 177.6 253.7 177.5Q253.9 177.4 254 177.3Q254.1 177.2 254.3 177.2Q254.4 177.1 254.6 177.1Q255.2 177.1 255.5 177.5Q255.8 177.9 255.8 178.5Q255.8 179.6 255.1 180.7Q254.4 181.7 253.1 182.4Q251.8 183.1 250 183.1Q247.6 183.1 246 181.9Q244.3 180.7 244.3 178.8ZM230.2 177.5Q230.2 174.3 233.1 172.4Q236 170.5 240.8 170.5Q242.1 170.5 243.2 170.7Q244.2 170.8 245 171.1L244.1 173.7Q243.5 173.4 243 173.3Q242.5 173.2 241.8 173.2Q240.6 173.2 239.9 173.9Q239.2 174.6 239.2 175.7Q239.2 176.9 239.9 177.6Q240.6 178.3 241.7 178.3Q242.6 178.3 243.3 177.9Q244 177.6 244.4 177.1L245 179.7Q243.9 181.3 241.7 182.2Q239.6 183.1 237.1 183.1Q234 183.1 232.1 181.5Q230.2 179.9 230.2 177.5ZM270.8 161.6V176.3Q270.8 177.5 271 178Q271.1 178.5 271.5 178.7L271.9 179Q272.8 179.6 272.8 180.6Q272.8 182.5 271 182.5H261.7Q260.7 182.5 260.2 182Q259.7 181.5 259.7 180.6Q259.7 180 259.9 179.5Q260.2 179.1 260.8 178.7L261.2 178.5Q261.5 178.3 261.7 177.8Q261.9 177.4 261.9 176.3V168Q261.9 167 261.6 166.6Q261.4 166.3 261 166L260.5 165.9Q260 165.6 259.7 165.2Q259.4 164.8 259.4 164.2Q259.4 163.5 259.8 163.1Q260.2 162.6 261.1 162.2L265.7 160.4Q266.9 160 267.6 159.8Q268.3 159.6 269 159.6Q269.9 159.6 270.3 160.2Q270.8 160.7 270.8 161.6ZM270 168 268.4 166.1 269.4 165Q272.5 162 274.9 160.8Q277.2 159.6 279.3 159.6Q282.3 159.6 284.2 161.6Q286 163.6 286 166.9V176.3Q286 177.4 286.2 177.8Q286.3 178.3 286.7 178.5L287.1 178.7Q287.6 179.1 287.9 179.6Q288.2 180 288.2 180.6Q288.2 181.5 287.7 182Q287.1 182.5 286.2 182.5H276.9Q275.1 182.5 275.1 180.6Q275.1 179.6 275.9 179L276.4 178.7Q276.8 178.5 276.9 178Q277 177.5 277 176.3V169.1Q277 167.5 276.3 166.7Q275.6 165.9 274.3 165.9Q273.5 165.9 272.6 166.2Q271.7 166.5 270.8 167.3ZM321.1 179.4Q318.6 179.1 317.2 178.9Q315.9 178.7 315.4 178.5Q315 178.3 315 177.9Q315 177.6 315.2 177.4Q315.4 177.2 315.8 176.9L315.4 176.5Q312.2 176.5 310.4 177.2Q308.5 177.8 307.8 178.9Q307 179.9 307 181.1Q307 182.3 307.7 183.3Q308.4 184.2 310.3 184.9Q312.2 185.6 315.8 186Q318.6 186.3 320.2 186.6Q321.8 186.9 322.4 187.2Q323.1 187.6 323.1 188.2Q323.1 188.7 322.6 189.1Q322.2 189.5 321 189.8Q319.8 190 317.7 190Q313.9 190 312.6 189.3Q311.3 188.6 311.3 187.5Q311.3 186.9 311.7 186.3Q312 185.7 312.6 185.5L312.2 185Q307.9 185.1 306.1 186.3Q304.3 187.4 304.3 189.5Q304.3 190.9 305.5 192Q306.7 193 309.2 193.5Q311.7 194.1 315.7 194.1Q323.2 194.1 327 191.8Q330.8 189.6 330.8 186Q330.8 184 329.9 182.7Q328.9 181.3 326.7 180.5Q324.6 179.8 321.1 179.4ZM320.4 162 322.9 162.4Q323.5 160.9 324 160.2Q324.6 159.5 325.3 159.5Q325.9 159.5 326.2 159.8Q326.6 160.2 326.9 160.6Q327.3 161 327.8 161.3Q328.4 161.6 329.3 161.6Q330.7 161.6 331.5 160.6Q332.3 159.6 332.3 157.9Q332.3 156.1 331.2 155.1Q330.1 154.2 328.4 154.2Q326.2 154.2 324.3 155.6Q322.5 157 321.2 160ZM328.9 168.2Q328.9 165.9 327.6 164Q326.2 162 323.7 160.8Q321.1 159.7 317.4 159.7Q313.5 159.7 310.7 160.8Q307.9 161.9 306.4 164Q304.9 166 304.9 168.9Q304.9 171.3 306.3 173.2Q307.8 175.1 310.5 176.1Q313.3 177.2 317.2 177.2Q320.7 177.2 323.3 176.1Q325.9 175 327.4 173Q328.9 170.9 328.9 168.2ZM316.2 162.9Q317.8 162.8 318.8 164.7Q319.7 166.5 319.9 169.6Q320.1 171.7 319.5 172.8Q318.9 174 317.6 174Q316.6 174 315.8 173.2Q315 172.4 314.5 170.9Q314.1 169.3 313.9 167.1Q313.8 165.8 314 164.9Q314.2 163.9 314.8 163.4Q315.3 162.9 316.2 162.9ZM357.5 168.1Q357.5 170 356.5 171Q355.4 172 353.4 172H340.3V169.2H347.1Q348.6 169.2 348.6 167.7Q348.6 165.7 347.8 164.8Q347 163.9 345.9 163.9Q345 163.9 344.2 164.4Q343.5 164.9 343 166Q342.6 167.2 342.6 168.9Q342.6 172.9 344.4 174.9Q346.3 176.9 349.4 176.9Q350.9 176.9 352.3 176.3Q353.7 175.8 354.8 174.8Q355.4 174.3 355.7 174.1Q356.1 173.9 356.4 173.9Q356.8 173.9 357.1 174.3Q357.5 174.6 357.5 175.3Q357.5 177.4 356.1 179.1Q354.8 180.9 352.4 182Q350.1 183.1 346.8 183.1Q343.1 183.1 340.4 181.7Q337.6 180.2 336.1 177.7Q334.6 175.1 334.6 171.7Q334.6 168.2 336 165.5Q337.5 162.7 340.3 161.2Q343.1 159.6 347.1 159.6Q350.4 159.6 352.7 160.7Q355 161.9 356.3 163.8Q357.5 165.8 357.5 168.1ZM373.7 149V176.3Q373.7 177.4 373.8 177.8Q374 178.3 374.4 178.5L374.8 178.7Q375.3 179.1 375.6 179.5Q375.9 180 375.9 180.6Q375.9 181.5 375.3 182Q374.8 182.5 373.8 182.5H364.5Q363.6 182.5 363 182Q362.5 181.5 362.5 180.6Q362.5 180 362.8 179.5Q363.1 179.1 363.6 178.7L364 178.5Q364.4 178.3 364.5 177.8Q364.7 177.4 364.7 176.3V155.4Q364.7 154.4 364.5 154.1Q364.2 153.7 363.8 153.5L363.3 153.3Q362.8 153 362.5 152.6Q362.2 152.3 362.2 151.7Q362.2 151 362.6 150.5Q363 150 364 149.7L368.6 147.9Q369.7 147.4 370.4 147.2Q371.1 147 371.9 147Q372.7 147 373.2 147.6Q373.7 148.2 373.7 149ZM403.3 168.1Q403.3 170 402.2 171Q401.1 172 399.2 172H386.1V169.2H392.8Q394.4 169.2 394.4 167.7Q394.4 165.7 393.6 164.8Q392.7 163.9 391.6 163.9Q390.7 163.9 389.9 164.4Q389.2 164.9 388.7 166Q388.3 167.2 388.3 168.9Q388.3 172.9 390.2 174.9Q392 176.9 395.1 176.9Q396.7 176.9 398.1 176.3Q399.5 175.8 400.5 174.8Q401.1 174.3 401.5 174.1Q401.8 173.9 402.2 173.9Q402.6 173.9 402.9 174.3Q403.2 174.6 403.2 175.3Q403.2 177.4 401.9 179.1Q400.6 180.9 398.2 182Q395.8 183.1 392.5 183.1Q388.8 183.1 386.1 181.7Q383.3 180.2 381.8 177.7Q380.3 175.1 380.3 171.7Q380.3 168.2 381.8 165.5Q383.2 162.7 386 161.2Q388.8 159.6 392.9 159.6Q396.1 159.6 398.4 160.7Q400.8 161.9 402 163.8Q403.3 165.8 403.3 168.1ZM419.4 161.6V176.3Q419.4 177.5 419.5 178Q419.7 178.5 420.1 178.7L420.5 179Q421.4 179.6 421.4 180.6Q421.4 182.5 419.6 182.5H410.2Q409.3 182.5 408.8 182Q408.2 181.5 408.2 180.6Q408.2 180 408.5 179.5Q408.8 179.1 409.4 178.7L409.8 178.5Q410.1 178.3 410.3 177.8Q410.5 177.4 410.5 176.3V168Q410.5 167 410.2 166.6Q410 166.3 409.5 166L409 165.9Q408.6 165.6 408.2 165.2Q407.9 164.8 407.9 164.2Q407.9 163.5 408.4 163.1Q408.8 162.6 409.7 162.2L414.3 160.4Q415.4 160 416.2 159.8Q416.9 159.6 417.6 159.6Q418.5 159.6 418.9 160.2Q419.4 160.7 419.4 161.6ZM418.6 168 416.9 166.1 418 165Q421.1 162 423.5 160.8Q425.8 159.6 427.9 159.6Q430.9 159.6 432.7 161.6Q434.6 163.6 434.6 166.9V176.3Q434.6 177.4 434.8 177.8Q434.9 178.3 435.3 178.5L435.7 178.7Q436.2 179.1 436.5 179.6Q436.8 180 436.8 180.6Q436.8 181.5 436.2 182Q435.7 182.5 434.8 182.5H425.5Q423.7 182.5 423.7 180.6Q423.7 179.6 424.5 179L425 178.7Q425.3 178.5 425.5 178Q425.6 177.5 425.6 176.3V169.1Q425.6 167.5 424.9 166.7Q424.2 165.9 422.9 165.9Q422 165.9 421.2 166.2Q420.3 166.5 419.4 167.3ZM464.5 149V176.3Q464.5 177.4 464.6 177.8Q464.8 178.3 465.2 178.5L465.6 178.7Q466.1 179.1 466.4 179.5Q466.7 180 466.7 180.6Q466.7 181.5 466.1 182Q465.6 182.5 464.6 182.5H455.3Q454.4 182.5 453.8 182Q453.3 181.5 453.3 180.6Q453.3 180 453.6 179.5Q453.9 179.1 454.4 178.7L454.8 178.5Q455.2 178.3 455.3 177.8Q455.5 177.4 455.5 176.3V155.4Q455.5 154.4 455.3 154.1Q455 153.7 454.6 153.5L454.1 153.3Q453.6 153 453.3 152.6Q453 152.3 453 151.7Q453 151 453.4 150.5Q453.8 150 454.8 149.7L459.4 147.9Q460.5 147.4 461.2 147.2Q461.9 147 462.7 147Q463.5 147 464 147.6Q464.5 148.2 464.5 149ZM494.1 168.1Q494.1 170 493 171Q491.9 172 490 172H476.9V169.2H483.6Q485.2 169.2 485.2 167.7Q485.2 165.7 484.4 164.8Q483.5 163.9 482.4 163.9Q481.5 163.9 480.7 164.4Q480 164.9 479.5 166Q479.1 167.2 479.1 168.9Q479.1 172.9 481 174.9Q482.8 176.9 485.9 176.9Q487.5 176.9 488.9 176.3Q490.3 175.8 491.3 174.8Q491.9 174.3 492.3 174.1Q492.6 173.9 493 173.9Q493.4 173.9 493.7 174.3Q494 174.6 494 175.3Q494 177.4 492.7 179.1Q491.4 180.9 489 182Q486.6 183.1 483.3 183.1Q479.6 183.1 476.9 181.7Q474.1 180.2 472.6 177.7Q471.1 175.1 471.1 171.7Q471.1 168.2 472.6 165.5Q474 162.7 476.8 161.2Q479.6 159.6 483.7 159.6Q486.9 159.6 489.2 160.7Q491.6 161.9 492.8 163.8Q494.1 165.8 494.1 168.1ZM519.7 165.5 507.7 181.2 506.7 178.9H510.4Q512 178.9 513.1 178.7Q514.3 178.4 515.2 177.7Q516.1 176.9 517.1 175.4L517.9 174.1Q518.3 173.4 518.9 173.1Q519.5 172.9 520.2 173Q521.1 173.2 521.4 173.8Q521.8 174.4 521.6 175.1L520.3 181.5Q520.1 182.3 519.6 182.8Q519.1 183.2 518.4 183.2Q517.5 183.2 516.9 182.8Q516.2 182.5 514.7 182.5H502.4Q500.6 182.5 499.8 181.8Q499 181.1 499 180Q499 179.3 499.3 178.6Q499.6 177.9 500.1 177.2L512.1 161.6L513.3 163.8H509.2Q507.8 163.8 506.9 164Q506 164.2 505.2 164.8Q504.5 165.4 503.7 166.5L502.9 167.8Q502.5 168.5 501.9 168.7Q501.3 169 500.6 168.8Q499.7 168.6 499.4 168.1Q499.1 167.5 499.2 166.7L500.4 161.2Q500.6 160.3 501.1 159.9Q501.5 159.5 502.3 159.5Q503.1 159.5 503.8 159.9Q504.5 160.2 505.9 160.2H518.3Q519.8 160.2 520.5 160.7Q521.2 161.3 521.2 162.3Q521.2 163.1 520.8 163.7Q520.5 164.4 519.7 165.5ZM546.9 165.5 535 181.2 534 178.9H537.6Q539.3 178.9 540.4 178.7Q541.5 178.4 542.4 177.7Q543.3 176.9 544.3 175.4L545.1 174.1Q545.6 173.4 546.2 173.1Q546.8 172.9 547.5 173Q548.3 173.2 548.6 173.8Q549 174.4 548.8 175.1L547.5 181.5Q547.3 182.3 546.8 182.8Q546.4 183.2 545.6 183.2Q544.8 183.2 544.1 182.8Q543.4 182.5 541.9 182.5H529.6Q527.8 182.5 527 181.8Q526.2 181.1 526.2 180Q526.2 179.3 526.5 178.6Q526.8 177.9 527.3 177.2L539.4 161.6L540.6 163.8H536.4Q535.1 163.8 534.1 164Q533.2 164.2 532.5 164.8Q531.7 165.4 531 166.5L530.2 167.8Q529.7 168.5 529.1 168.7Q528.5 169 527.8 168.8Q527 168.6 526.6 168.1Q526.3 167.5 526.5 166.7L527.7 161.2Q527.9 160.3 528.3 159.9Q528.8 159.5 529.6 159.5Q530.4 159.5 531 159.9Q531.7 160.2 533.2 160.2H545.6Q547 160.2 547.7 160.7Q548.4 161.3 548.4 162.3Q548.4 163.1 548.1 163.7Q547.7 164.4 546.9 165.5ZM576.3 168.1Q576.3 170 575.2 171Q574.1 172 572.1 172H559V169.2H565.8Q567.4 169.2 567.4 167.7Q567.4 165.7 566.5 164.8Q565.7 163.9 564.6 163.9Q563.7 163.9 562.9 164.4Q562.2 164.9 561.7 166Q561.3 167.2 561.3 168.9Q561.3 172.9 563.1 174.9Q565 176.9 568.1 176.9Q569.6 176.9 571.1 176.3Q572.5 175.8 573.5 174.8Q574.1 174.3 574.5 174.1Q574.8 173.9 575.1 173.9Q575.5 173.9 575.9 174.3Q576.2 174.6 576.2 175.3Q576.2 177.4 574.9 179.1Q573.5 180.9 571.2 182Q568.8 183.1 565.5 183.1Q561.8 183.1 559.1 181.7Q556.3 180.2 554.8 177.7Q553.3 175.1 553.3 171.7Q553.3 168.2 554.8 165.5Q556.2 162.7 559 161.2Q561.8 159.6 565.9 159.6Q569.1 159.6 571.4 160.7Q573.7 161.9 575 163.8Q576.3 165.8 576.3 168.1ZM581.9 164.1 581.4 163.9Q580.8 163.6 580.5 163.2Q580.2 162.7 580.2 162.1Q580.2 161.2 580.8 160.7Q581.3 160.2 582.2 160.2H583.2Q583.7 160.2 584.1 159.9Q584.6 159.5 585.1 158.7L587 156Q587.6 155.1 588.4 154.6Q589.2 154 589.9 154Q590.9 154 591.5 154.6Q592 155.1 592 156.2V173.8Q592 175.3 592.6 176Q593.2 176.8 594.3 176.8Q594.9 176.8 595.5 176.5Q596 176.2 596.4 175.8Q596.8 175.5 597.2 175.2Q597.5 174.9 597.9 174.9Q598.4 175 598.6 175.3Q598.9 175.7 598.9 176.4Q598.9 178.2 597.8 179.7Q596.7 181.2 594.9 182.2Q593 183.1 590.8 183.1Q587 183.1 585.1 181.3Q583.1 179.5 583.1 175.8V166.1Q583.1 165.2 582.8 164.8Q582.5 164.4 581.9 164.1ZM588.9 164.5V160.2H597.1Q598 160.2 598.5 160.6Q599 161 599 161.8Q599 163 598 163.8Q597 164.5 594.7 164.5Z"/><path class="d-tx" d="M0 269V239H23.5V245.6H8.4V250.6H21.7V257H8.4V262.4H24.1V269ZM40.1 269V245.7H30.9V239H57.7V245.7H48.6V269ZM65.8 269V239H74.3V262.3H88.6V269ZM96.8 269V239H105.3V269ZM101 236.6Q99.2 236.6 98 235.5Q96.8 234.3 96.8 232.4Q96.8 230.6 98 229.4Q99.2 228.2 101 228.2Q102.9 228.2 104.1 229.4Q105.3 230.6 105.3 232.4Q105.3 234.3 104.1 235.5Q102.9 236.6 101 236.6ZM133.6 269V239H157.1V245.6H142V250.6H155.3V257H142V262.4H157.6V269ZM167.2 269V239H175.6V251.5L187.3 239H196.6L184.4 252.3L197.2 269H187.4L178.8 258.1L175.6 261.5V269ZM204.4 269V239H211.3L221.9 256.4L232.2 239H239.2L239.2 269H231.4L231.4 253.1L223.6 266H219.9L212.2 253.5V269ZM250.1 269V239H273.7V245.6H258.5V250.6H271.9V257H258.5V262.4H274.2V269ZM283.8 269V239H292.2V251.5L303.8 239H313.2L300.9 252.3L313.8 269H303.9L295.3 258.1L292.2 261.5V269Z"/><rect class="d-bar" x="339.8" y="250.5" width="30" height="7"/><path class="d-tx" d="M395.8 269V239H404.3V262.3H418.6V269ZM423.5 269 436.8 239H445.1L458.4 269H449.6L447.2 263.2H434.5L432.2 269ZM437 256.9H444.7L440.9 247.3ZM485.8 269V257.3H474.2V269H465.7V239H474.2V250.3H485.8V239H494.2V269ZM505.1 269V239H512.1L522.6 256.4L532.9 239H539.9L540 269H532.2L532.1 253.1L524.4 266H520.6L513 253.5V269ZM547.3 269 560.5 239H568.9L582.2 269H573.3L571 263.2H558.3L555.9 269ZM560.8 256.9H568.5L564.6 247.3ZM604 269.6Q600.4 269.6 597.4 268.4Q594.4 267.3 592.2 265.2Q590 263.1 588.7 260.3Q587.5 257.4 587.5 254Q587.5 250.6 588.7 247.7Q590 244.9 592.2 242.8Q594.4 240.7 597.4 239.6Q600.4 238.4 604 238.4Q608.1 238.4 611.4 239.9Q614.7 241.3 616.9 244.1L611.5 248.9Q610.1 247.2 608.3 246.3Q606.6 245.4 604.4 245.4Q601.9 245.4 600.1 246.5Q598.2 247.6 597.1 249.5Q596.1 251.4 596.1 254Q596.1 256.6 597.1 258.5Q598.2 260.4 600.1 261.5Q601.9 262.6 604.4 262.6Q606.6 262.6 608.3 261.7Q610.1 260.8 611.5 259.1L616.9 263.9Q614.7 266.7 611.4 268.1Q608.1 269.6 604 269.6ZM638.7 269.6Q632.1 269.6 628.4 266Q624.6 262.4 624.6 255.6V239H633.1V255.4Q633.1 259.2 634.6 260.9Q636.2 262.6 638.8 262.6Q641.5 262.6 643 260.9Q644.5 259.2 644.5 255.4V239H652.8V255.6Q652.8 262.4 649.1 266Q645.4 269.6 638.7 269.6ZM663.5 269V239H670.4L683.7 255V239H692V269H685L671.8 253V269Z"/></svg>
+      </h1>
+      <p class="lead">Keçiören Bademlik'te etli ekmek, lahmacun ve pide; fırından sıcak sıcak. Yerinde, paket ya da hızlı teslimat.</p>
+      <div class="hero-cta">
+        <a class="btn red" href="https://wa.me/905399154308?text=Merhaba%2C%20sipari%C5%9F%20vermek%20istiyorum." target="_blank" rel="noopener">WhatsApp'tan sipariş ver</a>
+        <a class="btn line" href="#menu">Menüye bak</a>
+        </div>
+      <ul class="chips" aria-label="Öne çıkanlar">
+        <li><b>★ 4,9</b> Google'da 40 yorum</li>
+        <li>Her gün 10:00–22:00</li>
+        <li>Paket servis</li>
+        <li>İkramlar ücretsiz</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="strip" aria-label="Kısa bilgi">
+    <ul>
+      <li>Bademlik Yolu Cd. 56 A, Keçiören</li>
+      <li>Her gün 10:00–22:00 açık</li>
+      <li>Sipariş: 0539 915 43 08</li>
+    </ul>
+  </div>
+
+  <section id="menu" class="menu" aria-labelledby="menu-title">
+    <div class="wrap">
+      <header class="menu-head">
+        <h2 class="h-xl" id="menu-title">Menü</h2>
+        <p>Fırından sıcak sıcak. Siparişini WhatsApp'tan yaz ya da ara, hemen hazırlayalım.</p>
+      </header>
+      <nav class="tabs" id="tabs" aria-label="Menü kategorileri"></nav>
+      <div id="cats"></div>
+      <div class="ikram"><b>İkramlar ücretsiz</b><span>Paket servisimiz var.</span></div>
+      <div class="order-cta">
+        <a class="btn red" href="https://wa.me/905399154308?text=Merhaba%2C%20sipari%C5%9F%20vermek%20istiyorum." target="_blank" rel="noopener">WhatsApp'tan sipariş ver</a>
+        <a class="btn ink" href="tel:+905399154308">Ara · 0539 915 43 08</a>
+      </div>
+      <p class="menu-note">Fiyatlar Türk lirasıdır ve değişebilir.</p>
+    </div>
+  </section>
+
+  <section id="biz" class="tabela" aria-labelledby="biz-title">
+    <div class="wrap tabela-in">
+      <div>
+        <p class="tabela-kicker">Bademlik, Keçiören</p>
+        <h2 class="h-xl" id="biz-title">Konya'dan gelen lezzet</h2>
+      </div>
+      <div class="tabela-body">
+        <p class="slogan">Hızlı, sıcak, lezzetli!</p>
+        <p>Express, Konya'nın etliekmeğini Keçiören Bademlik'e getiriyor. Etli ekmek, bıçak arası, lahmacun ve pideler fırından sıcak sıcak çıkıyor. Siparişin en kısa sürede hazırlanır.</p>
+        <ul class="feats" aria-label="Hizmetler">
+          <li>Yerinde servis</li><li>Paket servis</li><li>Hızlı teslimat</li><li>Ücretsiz ikram</li>
+        </ul>
+        <a class="rating" href="https://www.google.com/maps/search/?api=1&amp;query=Express%20Etli%20Ekmek%20Lahmacun%20Bademlik%20Yolu%20Cd.%2056A%20Ke%C3%A7i%C3%B6ren%20Ankara" target="_blank" rel="noopener"><b>★ 4,9</b>Google'da 40 yorumu oku ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="iletisim" class="contact" aria-labelledby="iletisim-title">
+    <div class="wrap contact-in">
+      <div>
+        <h2 class="h-xl" id="iletisim-title">Bize ulaş</h2>
+        <div class="contact-cta">
+          <a class="btn red" href="https://wa.me/905399154308?text=Merhaba%2C%20sipari%C5%9F%20vermek%20istiyorum." target="_blank" rel="noopener">WhatsApp ile yaz</a>
+          <a class="btn line" href="tel:+905399154308">Ara</a>
+          <a class="btn line" href="https://www.google.com/maps/dir/?api=1&amp;destination=Express%20Etli%20Ekmek%20Lahmacun%2C%20Bademlik%20Yolu%20Cd.%2056A%2C%20Ke%C3%A7i%C3%B6ren%2C%20Ankara" target="_blank" rel="noopener">Yol tarifi ↗</a>
+        </div>
+      </div>
+      <dl class="info">
+        <div><dt>Adres</dt><dd><span>Bademlik Yolu Cd. No: 56 A<br>Bademlik, 06300 Keçiören / Ankara</span><a class="linkish" href="https://www.google.com/maps/search/?api=1&amp;query=Express%20Etli%20Ekmek%20Lahmacun%20Bademlik%20Yolu%20Cd.%2056A%20Ke%C3%A7i%C3%B6ren%20Ankara" target="_blank" rel="noopener">Haritada aç ↗</a></dd></div>
+        <div><dt>Telefon</dt><dd><span id="tel">0539 915 43 08</span><button class="linkish" type="button" id="copy-tel">Numarayı kopyala</button></dd></div>
+        <div><dt>Saatler</dt><dd><span>Her gün 10:00 – 22:00</span></dd></div>
+        <div><dt>Hizmet</dt><dd><span>Yerinde · Paket servis · Hızlı teslimat</span></dd></div>
+        <div><dt>Instagram</dt><dd><a class="linkish" href="https://www.instagram.com/express_etli_ekmek_lahmacun/" target="_blank" rel="noopener">@express_etli_ekmek_lahmacun ↗</a></dd></div>
+      </dl>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <a class="brand" href="#ust" aria-label="Başa dön">
+    <svg class="lg" viewBox="-76 -63 770 184" aria-hidden="true" focusable="false"><use href="#xl"/></svg>
+    <span class="brand-sub">ETLİ EKMEK · LAHMACUN</span>
+  </a>
+  <p>Bademlik Yolu Cd. 56 A, Keçiören / Ankara · 0539 915 43 08</p>
+  <p>© 2026 Express Etli Ekmek Lahmacun</p>
+</footer>
+
+<div class="bar" id="bar">
+  <nav class="bar-quick" aria-label="Hızlı erişim">
+    <a href="tel:+905399154308">Ara</a>
+    <a class="red" href="https://wa.me/905399154308?text=Merhaba%2C%20sipari%C5%9F%20vermek%20istiyorum." target="_blank" rel="noopener">WhatsApp</a>
+    <a href="https://www.google.com/maps/dir/?api=1&amp;destination=Express%20Etli%20Ekmek%20Lahmacun%2C%20Bademlik%20Yolu%20Cd.%2056A%2C%20Ke%C3%A7i%C3%B6ren%2C%20Ankara" target="_blank" rel="noopener">Yol tarifi</a>
+  </nav>
+</div>
+</div>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Restaurant","name":"Express Etli Ekmek Lahmacun",
+ "address":{"@type":"PostalAddress","streetAddress":"Bademlik Yolu Cd. No: 56 A","addressLocality":"Keçiören","addressRegion":"Ankara","postalCode":"06300","addressCountry":"TR"},
+ "telephone":"+90 539 915 43 08","servesCuisine":["Etli ekmek","Pide","Lahmacun"],"priceRange":"₺₺",
+ "openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"10:00","closes":"22:00"},
+ "sameAs":["https://www.instagram.com/express_etli_ekmek_lahmacun/"]}
+</script>
+<script>
+(() => {
+const CATS = [
+  { id: 'firin', name: 'Fırından' },
+  { id: 'kir', name: 'Kır pidesi' },
+  { id: 'tatli', name: 'Tatlılar' },
+  { id: 'icecek', name: 'İçecekler' }
+];
+/* fiyatlar dükkandaki menüden (1 Temmuz 2026'dan itibaren geçerli liste) */
+const MENU = [
+  { cat: 'firin', name: 'Etli Ekmek', price: 190, img: 'img/menu-etli', desc: 'Konya usulü, ince ve upuzun. Kıyma, soğan, domates, biber.' },
+  { cat: 'firin', name: 'Bıçak Arası', price: 230, img: 'img/menu-bicak', desc: 'Bıçakla doğranmış et, incecik hamur.' },
+  { cat: 'firin', name: 'Lahmacun', price: 100, img: 'img/menu-lahmacun', desc: 'İnce, yuvarlak, kenarına kadar harçlı.' },
+  { cat: 'firin', name: 'Mevlana', price: 210 },
+  { cat: 'firin', name: 'Recai', price: 250 },
+  { cat: 'firin', name: 'Special Pide', price: 290 },
+  { cat: 'firin', name: 'Börek', price: 200 },
+  { cat: 'kir', name: 'Konya Kapalı Kıymalı', price: 100, desc: 'Kıymalı harçla kapalı pide.' },
+  { cat: 'kir', name: 'Konya Kapalı Peynirli', price: 90, desc: 'Peynirli kapalı pide.' },
+  { cat: 'tatli', name: 'Katmer', price: 170 },
+  { cat: 'tatli', name: 'Künefe', price: 140 },
+  { cat: 'tatli', name: 'Antep Fıstıklı Künefe', price: 190 },
+  { cat: 'tatli', name: 'Hasır', price: 190 },
+  { cat: 'icecek', name: 'Cola', price: 50 },
+  { cat: 'icecek', name: 'Fanta', price: 50 },
+  { cat: 'icecek', name: 'Gazoz', price: 45 },
+  { cat: 'icecek', name: 'Ayran', price: 35 },
+  { cat: 'icecek', name: 'Ayran (1 L)', price: 80 },
+  { cat: 'icecek', name: 'Cola (1 L)', price: 90 }
+];
+const TL = n => '₺' + n.toLocaleString('tr-TR');
+const $ = id => document.getElementById(id);
+const el = (tag, attrs = {}, text) => { const e = document.createElement(tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; };
+
+const tabs = $('tabs'), cats = $('cats');
+for (const c of CATS) {
+  tabs.append(el('a', { href: '#cat-' + c.id, 'data-cat': c.id }, c.name));
+  const sec = el('section', { class: 'cat', id: 'cat-' + c.id, 'aria-labelledby': 'h-' + c.id });
+  const h = el('h3', { id: 'h-' + c.id }); h.append(c.name);
+  sec.append(h);
+  const items = MENU.filter(m => m.cat === c.id);
+  const withImg = items.filter(m => m.img), plain = items.filter(m => !m.img);
+  if (withImg.length) {
+    const ul = el('ul', { class: 'feat' });
+    for (const it of withImg) {
+      const li = el('li', { class: 'fcard' });
+      li.append(el('img', { src: it.img + '-s.webp', srcset: it.img + '-s.webp 320w, ' + it.img + '-m.webp 640w',
+        sizes: '(min-width:760px) 30vw, 116px', alt: it.name, width: '320', height: '240', loading: 'lazy' }));
+      const b = el('div', { class: 'fb' }), hd = el('div', { class: 'fh' });
+      hd.append(el('h4', {}, it.name), el('span', { class: 'price' }, TL(it.price)));
+      b.append(hd);
+      if (it.desc) b.append(el('p', {}, it.desc));
+      li.append(b); ul.append(li);
+    }
+    sec.append(ul);
+  }
+  if (plain.length) {
+    const ul = el('ul', { class: 'list' });
+    for (const it of plain) {
+      const li = el('li', { class: 'row' }), hd = el('div', { class: 'rh' });
+      hd.append(el('h4', {}, it.name), el('i', { 'aria-hidden': 'true' }), el('span', { class: 'price' }, TL(it.price)));
+      li.append(hd);
+      if (it.desc) li.append(el('p', {}, it.desc));
+      ul.append(li);
+    }
+    sec.append(ul);
+  }
+  cats.append(sec);
+}
+
+/* görünen kategori sekmede işaretlenir */
+const tabLinks = [...tabs.querySelectorAll('a')];
+const setTab = id => tabLinks.forEach(a => a.setAttribute('aria-current', a.dataset.cat === id ? 'true' : 'false'));
+setTab(CATS[0].id);
+if ('IntersectionObserver' in window) {
+  const io = new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) setTab(e.target.id.replace('cat-', '')); }); }, { rootMargin: '-40% 0px -55% 0px' });
+  cats.querySelectorAll('.cat').forEach(s => io.observe(s));
+}
+
+/* telefon numarasını kopyala */
+$('copy-tel').addEventListener('click', () => {
+  const b = $('copy-tel'), t = $('tel');
+  const ok = () => { b.textContent = 'Kopyalandı'; setTimeout(() => { b.textContent = 'Numarayı kopyala'; }, 1600); };
+  const fb = () => { const r = document.createRange(); r.selectNodeContents(t); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Seçildi'; };
+  try { navigator.clipboard.writeText(t.textContent).then(ok, fb); } catch (e) { fb(); }
+});
+try { localStorage.removeItem('express-sepet'); } catch (e) {}
+})();
+</script>
+
+</body>
+</html>
